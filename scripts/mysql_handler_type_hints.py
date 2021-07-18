@@ -1,9 +1,9 @@
 """
-MySQL handler
+MySQL handler for type hints
 """
 import logging
-from collections import namedtuple
 from contextlib import contextmanager
+from typing import Optional, List
 
 import pymysql
 from pymysql.constants import CLIENT
@@ -15,6 +15,13 @@ DB_USER = 'user'
 DB_PASS = 'password'
 DB_NAME = 'test'
 DB_CHARSET = 'utf8mb4'
+
+
+class FetchObject(object):
+    """MySQL fetch object
+
+    This class needs to use setattr() to dynamically set attributes.
+    """
 
 
 class MySQLHandler(object):
@@ -54,25 +61,25 @@ class MySQLHandler(object):
             self.conn.rollback()
             logging.exception(e)
 
-    def _tuple_to_object(self, data):
+    def _tuple_to_object(self, data: List[tuple]) -> List[FetchObject]:
         obj_list = []
         attrs = [desc[0] for desc in self.cursor.description]
         for i in data:
-            obj = namedtuple('FetchObject', attrs)
+            obj = FetchObject()
             for attr, value in zip(attrs, i):
                 setattr(obj, attr, value)
             obj_list.append(obj)
         return obj_list
 
-    def fetchone(self):
+    def fetchone(self) -> Optional[FetchObject]:
         result = self.cursor.fetchone()
         return self._tuple_to_object([result])[0] if result else None
 
-    def fetchmany(self, size=None):
+    def fetchmany(self, size: Optional[int] = None) -> Optional[List[FetchObject]]:
         result = self.cursor.fetchmany(size)
         return self._tuple_to_object(result) if result else None
 
-    def fetchall(self):
+    def fetchall(self) -> Optional[List[FetchObject]]:
         result = self.cursor.fetchall()
         return self._tuple_to_object(result) if result else None
 
