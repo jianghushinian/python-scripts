@@ -1,7 +1,6 @@
 """
 MySQL handler
 """
-import logging
 from collections import namedtuple
 from contextlib import contextmanager
 
@@ -43,7 +42,7 @@ class MySQLHandler(object):
             self.conn.commit()
         except Exception as e:
             self.conn.rollback()
-            logging.exception(e)
+            raise e
 
     @contextmanager
     def executemany(self):
@@ -52,7 +51,7 @@ class MySQLHandler(object):
             self.conn.commit()
         except Exception as e:
             self.conn.rollback()
-            logging.exception(e)
+            raise e
 
     def _tuple_to_object(self, data):
         obj_list = []

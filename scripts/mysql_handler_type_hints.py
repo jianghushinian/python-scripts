@@ -1,7 +1,6 @@
 """
 MySQL handler for type hints
 """
-import logging
 from contextlib import contextmanager
 from typing import Optional, List
 
@@ -50,7 +49,7 @@ class MySQLHandler(object):
             self.conn.commit()
         except Exception as e:
             self.conn.rollback()
-            logging.exception(e)
+            raise e
 
     @contextmanager
     def executemany(self):
@@ -59,7 +58,7 @@ class MySQLHandler(object):
             self.conn.commit()
         except Exception as e:
             self.conn.rollback()
-            logging.exception(e)
+            raise e
 
     def _tuple_to_object(self, data: List[tuple]) -> List[FetchObject]:
         obj_list = []
